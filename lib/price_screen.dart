@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bitcoin_ticker_app/crypto_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,8 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   var selectedCurrency = 'AUD';
   String bitCoinValue = '?';
+  bool isWaiting = false;
+  Map<String, String> bitCoinValueMap = {};
 
   DropdownButton<String> androidDropDown() {
     List<DropdownMenuItem<String>> ddCurrencies = [];
@@ -57,10 +60,13 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   void getData() async {
+    isWaiting = true;
+
     try {
       var data = await CoinData().getCoinData(selectedCurrency);
+      isWaiting = false;
       setState(() {
-        bitCoinValue = data;
+        bitCoinValueMap = data;
       });
     } catch (e) {
       print(e.toString());
@@ -83,26 +89,20 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = $bitCoinValue $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
+          CryptoCard(
+            cryptoCurrency: 'BTC',
+            bitCoinValue: isWaiting ? '?' : bitCoinValueMap['BTC'],
+            selectedCurrency: selectedCurrency,
+          ),
+          CryptoCard(
+            cryptoCurrency: 'ETH',
+            bitCoinValue: isWaiting ? '?' : bitCoinValueMap['ETH'],
+            selectedCurrency: selectedCurrency,
+          ),
+          CryptoCard(
+            cryptoCurrency: 'LTC',
+            bitCoinValue: isWaiting ? '?' : bitCoinValueMap['LTC'],
+            selectedCurrency: selectedCurrency,
           ),
           Container(
             height: 150.0,
